@@ -10,8 +10,6 @@
     async function logVisitor() {
       try {
         const res = await fetch("https://ipapi.co/json/");
-        if (!res.ok) throw new Error("IP API failed");
-
         const data = await res.json();
 
         const ip = data.ip || "No IP";
@@ -22,27 +20,22 @@
         const lon = data.longitude || "0";
         const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
         const timestamp = new Date().toLocaleString();
+        const location = `${ip} — ${city}, ${region}, ${country}`;
 
-        const fullLocation = `${ip} — ${city}, ${region}, ${country}`;
+        await fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            value1: location,
+            value2: mapsLink,
+            value3: timestamp
+          })
+        });
 
-        // Send to IFTTT only if IP is valid
-        if (ip !== "No IP") {
-          await fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              value1: fullLocation,
-              value2: mapsLink,
-              value3: timestamp
-            })
-          });
-        } else {
-          console.error("IP was not received");
-        }
       } catch (err) {
-        console.error("Logging error:", err);
+        console.error("Logging failed:", err);
       }
     }
 
