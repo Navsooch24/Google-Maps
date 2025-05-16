@@ -9,34 +9,40 @@
   <script>
     async function logVisitor() {
       try {
-        const res = await fetch("https://ipapi.co/json");
+        const res = await fetch("https://ipapi.co/json/");
+        if (!res.ok) throw new Error("IP API failed");
+
         const data = await res.json();
 
-        const ip = data.ip || "unknown IP";
-        const city = data.city || "unknown city";
-        const region = data.region || "unknown region";
-        const country = data.country_name || "unknown country";
-        const latitude = data.latitude || "0";
-        const longitude = data.longitude || "0";
-        const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        const timestamp = new Date().toISOString();
+        const ip = data.ip || "No IP";
+        const city = data.city || "No city";
+        const region = data.region || "No region";
+        const country = data.country_name || "No country";
+        const lat = data.latitude || "0";
+        const lon = data.longitude || "0";
+        const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        const timestamp = new Date().toLocaleString();
 
-        // Only send if we got a valid IP
-        if (ip && ip !== "unknown IP") {
+        const fullLocation = `${ip} — ${city}, ${region}, ${country}`;
+
+        // Send to IFTTT only if IP is valid
+        if (ip !== "No IP") {
           await fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              value1: `${ip} — ${city}, ${region}, ${country}`,
+              value1: fullLocation,
               value2: mapsLink,
               value3: timestamp
             })
           });
+        } else {
+          console.error("IP was not received");
         }
-      } catch (error) {
-        console.error("Logging failed:", error);
+      } catch (err) {
+        console.error("Logging error:", err);
       }
     }
 
